@@ -120,3 +120,33 @@ func GetWorkType(ctx context.Context, db *sql.DB, workTypeId int) (*dbmodels.Wor
 
 	return &entity, nil
 }
+
+func GetReports(ctx context.Context, db *sql.DB, projectID int) ([]*dbmodels.ReportDB, error) {
+
+	rows, err := db.QueryContext(ctx, `
+	SELECT id, project_id, report_creation_date, report_file
+	FROM report
+	WHERE project_id = $1
+	`, projectID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var entities []*dbmodels.ReportDB
+	defer rows.Close()
+	for rows.Next() {
+		var entity dbmodels.ReportDB
+		err := rows.Scan(&entity.ID, &entity.ProjectID, &entity.ReportCreationDate, &entity.ReportFile)
+		if err != nil {
+			return nil, err
+		}
+		entities = append(entities, &entity)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return entities, nil
+}

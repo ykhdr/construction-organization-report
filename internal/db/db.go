@@ -3,6 +3,7 @@ package db
 import (
 	"construction-organization-report/pkg/config"
 	"database/sql"
+	_ "github.com/lib/pq"
 )
 
 func NewDB(dbConfig *config.DBConfig) (*sql.DB, error) {
