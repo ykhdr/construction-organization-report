@@ -5,6 +5,7 @@ import (
 	"construction-organization-report/internal/log"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sync"
@@ -103,6 +104,20 @@ func CreateReport(projectID int, database *sql.DB) (*Report, error) {
 	report.Estimate.MaterialUsage = <-materialUsagesChan
 	report.Estimate.LastUpdateDate = time.Now()
 
+	log.Logger.Infoln("Saving report to database")
+	reportDB, err := convertReportToReportDB(report)
+	if err != nil {
+		log.Logger.WithError(err).Error("error while converting report to raw report")
+		return nil, fmt.Errorf("error while converting report to raw report")
+	}
+
+	_, err = db.SaveReport(context.Background(), database, reportDB)
+	if err != nil {
+		log.Logger.WithError(err).Error("error while saving report")
+		return nil, fmt.Errorf("error while saving report")
+	}
+	log.Logger.Infoln("Report saved")
+
 	return report, nil
 }
 
@@ -126,4 +141,28 @@ func GetReports(projectID int, database *sql.DB) ([]*RawReport, error) {
 	}
 
 	return rawReports, nil
+}
+
+func convertReportToReportDB(report *Report) (*db.ReportDB, error) {
+	intermediate := struct {
+		Schedules []*Schedule `json:"schedules"`
+		Estimate  *Estimate   `json:"estimate"`
+	}{
+		Schedules: report.Schedules,
+		Estimate:  report.Estimate,
+	}
+
+	reportData, err := json.Marshal(intermediate)
+	if err != nil {
+		return nil, err
+	}
+
+	reportDB := &db.ReportDB{
+		ID:                 report.ID,
+		ProjectID:          report.ProjectID,
+		ReportCreationDate: time.Now(), // Пример заполнения даты создания отчета
+		ReportFile:         json.RawMessage(reportData),
+	}
+
+	return reportDB, nil
 }
