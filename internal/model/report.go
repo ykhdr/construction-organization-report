@@ -3,15 +3,15 @@ package model
 import "time"
 
 type Report struct {
-	ID        int        `json:"id"`
-	ProjectID int        `json:"project_id"`
-	Schedules []Schedule `json:"schedules"`
-	Estimate  Estimate   `json:"estimate"`
+	ID        int         `json:"id"`
+	ProjectID int         `json:"project_id"`
+	Schedules []*Schedule `json:"schedules"`
+	Estimate  *Estimate   `json:"estimate"`
 }
 
 type Schedule struct {
-	WorkType      WorkType
-	Team          Team      `json:"construction_team"`
+	WorkType      *WorkType
+	Team          *Team     `json:"construction_team"`
 	PlanStartDate time.Time `json:"plan_start_date"`
 	PlanEndDate   time.Time `json:"plan_end_date"`
 	FactStartDate time.Time `json:"fact_start_date"`
@@ -31,8 +31,8 @@ type Team struct {
 }
 
 type Estimate struct {
-	MaterialUsage  []MaterialUsage `json:"material_usage"`
-	LastUpdateDate time.Time       `json:"last_update_date"`
+	MaterialUsage  []*MaterialUsage `json:"material_usage"`
+	LastUpdateDate time.Time        `json:"last_update_date"`
 }
 
 type MaterialUsage struct {
