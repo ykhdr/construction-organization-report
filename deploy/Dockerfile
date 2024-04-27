@@ -8,8 +8,9 @@ COPY go.sum .
 
 RUN go download
 
-COPY ./cmd ./cmd
-COPY ./internal ./internal
+COPY ../cmd cmd
+COPY ../internal internal
+COPY ../pkg pkg
 RUN go build -o construction-ogranization-report ./cmd/main.go
 
 FROM alpine:3.19.1
