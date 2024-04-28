@@ -6,13 +6,13 @@ WORKDIR /build
 COPY go.mod .
 COPY go.sum .
 
-RUN go download
+RUN go mod download
 
-COPY ../cmd cmd
-COPY ../internal internal
-COPY ../pkg pkg
+COPY cmd cmd
+COPY internal internal
+COPY pkg pkg
 RUN go build -o construction-ogranization-report ./cmd/main.go
 
 FROM alpine:3.19.1
-COPY --from=builder construction-ogranization-report /bin/construction-ogranization-report
+COPY --from=builder /build/construction-ogranization-report /bin/construction-ogranization-report
 ENTRYPOINT ["/bin/construction-ogranization-report"]
