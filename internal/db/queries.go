@@ -1,7 +1,6 @@
 package db
 
 import (
-	"construction-organization-report/internal/report"
 	"context"
 	"database/sql"
 	"time"
@@ -135,17 +134,17 @@ func SaveReport(ctx context.Context, db *sql.DB, report *ReportDB) (int, error) 
 	return report.ID, nil
 }
 
-func GetReport(ctx context.Context, db *sql.DB, reportID int) (*report.RawReport, error) {
-	var rawReport report.RawReport
+func GetReport(ctx context.Context, db *sql.DB, reportID int) (*ReportDB, error) {
+	var reportDB ReportDB
 	err := db.QueryRowContext(ctx, `
 	SELECT id, project_id, report_creation_date, report_file
 	FROM report
 	WHERE id = $1
-	`, reportID).Scan(&rawReport.ID, &rawReport.ProjectID, &rawReport.ReportCreationDate, &rawReport.ReportFile)
+	`, reportID).Scan(&reportDB.ID, &reportDB.ProjectID, &reportDB.ReportCreationDate, &reportDB.ReportFile)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &rawReport, nil
+	return &reportDB, nil
 }

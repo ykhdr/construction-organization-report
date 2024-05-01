@@ -149,7 +149,12 @@ func GetRawReport(reportID int, database *sql.DB) (*RawReport, error) {
 		return nil, err
 	}
 
-	return rawReport, nil
+	return &RawReport{
+		ID:                 rawReport.ID,
+		ProjectID:          rawReport.ProjectID,
+		ReportCreationDate: rawReport.ReportCreationDate,
+		ReportFile:         rawReport.ReportFile,
+	}, nil
 }
 
 func convertReportToReportDB(report *Report) (*db.ReportDB, error) {
