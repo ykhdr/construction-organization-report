@@ -121,8 +121,7 @@ func CreateReport(projectID int, database *sql.DB) (*Report, error) {
 	return report, nil
 }
 
-func GetReports(projectID int, database *sql.DB) ([]*RawReport, error) {
-
+func GetRawReports(projectID int, database *sql.DB) ([]*RawReport, error) {
 	reports, err := db.GetReports(context.Background(), database, projectID)
 
 	if err != nil {
@@ -141,6 +140,16 @@ func GetReports(projectID int, database *sql.DB) ([]*RawReport, error) {
 	}
 
 	return rawReports, nil
+}
+
+func GetRawReport(reportID int, database *sql.DB) (*RawReport, error) {
+	rawReport, err := db.GetReport(context.Background(), database, reportID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rawReport, nil
 }
 
 func convertReportToReportDB(report *Report) (*db.ReportDB, error) {

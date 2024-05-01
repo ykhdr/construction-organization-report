@@ -10,10 +10,7 @@ import (
 )
 
 func (s *Server) handleCreateReport(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	projectID, err := strconv.Atoi(vars["id"])
-
+	projectID, err := strconv.Atoi(r.URL.Query().Get("project_id"))
 	if err != nil {
 		log.Logger.Warningln("Error in parse project id", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -38,10 +35,7 @@ func (s *Server) handleCreateReport(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleGetReports(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	projectID, err := strconv.Atoi(vars["id"])
-
+	projectID, err := strconv.Atoi(r.URL.Query().Get("project_id"))
 	if err != nil {
 		log.Logger.Warningln("Error in parse project id", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -49,7 +43,7 @@ func (s *Server) handleGetReports(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Logger.Infoln("Get report for project", projectID)
-	rawReport, err := report.GetReports(projectID, s.db)
+	rawReport, err := report.GetRawReports(projectID, s.db)
 	if err != nil {
 		log.Logger.Warningln("Error on get report", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -63,4 +57,30 @@ func (s *Server) handleGetReports(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+}
+
+func (s *Server) handleGetReport(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	reportID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Logger.Warningln("Error in parse report id", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Logger.Infoln("Get report", reportID)
+	rawReport, err := report.GetRawReport(reportID, s.db)
+	if err != nil {
+		log.Logger.Warningln("Error on get report", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Logger.Infoln("Report got successful", reportID)
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(rawReport)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
