@@ -31,8 +31,8 @@ func main() {
 
 	log.Logger.Infoln("Successful database connection")
 
-	log.Logger.Infoln("Run server on port 8081")
-	server := api.NewServer(":8081", newDB)
+	log.Logger.Infoln("Run server on port 8080")
+	server := api.NewServer(":8080", newDB)
 	server.InitializeRoutes()
 	server.Start()
 }
